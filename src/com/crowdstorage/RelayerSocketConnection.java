@@ -6,11 +6,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class RelayerSocketConnection implements Runnable {
-    private Socket proxiedClientSocket;
+    private Socket proxiedClientNotifierSocket;
     private String host;
 
     public RelayerSocketConnection(Socket proxiedClientSocket, String host){
-        this.proxiedClientSocket = proxiedClientSocket;
+        this.proxiedClientNotifierSocket = proxiedClientSocket;
         this.host = host;
     }
 
@@ -18,12 +18,12 @@ public class RelayerSocketConnection implements Runnable {
         ServerSocket relayedServerSocket = null;
 
         try {
+            PrintWriter writeToProxy = new PrintWriter(proxiedClientNotifierSocket.getOutputStream());
             relayedServerSocket = new ServerSocket(0);
-            sendConnectionMessage(relayedServerSocket.getLocalPort());
+            sendConnectionMessage(writeToProxy, relayedServerSocket.getLocalPort());
             while(true) {
                 Socket relayedClientSocket = relayedServerSocket.accept();
-                new Thread(new RelayConnectionHandler(proxiedClientSocket, relayedClientSocket)).start();
-                new Thread(new RelayConnectionHandler(relayedClientSocket, proxiedClientSocket)).start();
+                new Thread(new ProxyAndRelayHandler(relayedClientSocket, writeToProxy, host)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,14 +36,9 @@ public class RelayerSocketConnection implements Runnable {
         }
     }
 
-    private void sendConnectionMessage(int port){
-        try {
-            PrintWriter writeToProxy = new PrintWriter(proxiedClientSocket.getOutputStream());
-            System.out.println("established relay address: " + host + ":" + port);
-            writeToProxy.println(host +":"+port);
-            writeToProxy.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void sendConnectionMessage(PrintWriter writeToProxy, int port){
+        System.out.println("established relay address: " + host + ":" + port);
+        writeToProxy.println(host +":"+port);
+        writeToProxy.flush();
     }
 }
