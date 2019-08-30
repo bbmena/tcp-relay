@@ -5,6 +5,8 @@ possible to connect with directly.
 
 ##### Useage instructions
 
+Build to jar and run: `java -jar tcp-relay.jar -p <Port> -h <Host>` All args optional
+
 The relay server should be initialized with arguments defining a host and port. If none are defined,
 the default is localhost:8080
 

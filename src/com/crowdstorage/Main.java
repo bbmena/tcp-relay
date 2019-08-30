@@ -23,6 +23,7 @@ public class Main {
                     host = args[i];
                 }
             }
+            System.out.println("Starting relay server on " + host + ":" + port);
         }
 
         ServerSocket socketServer = new ServerSocket(port);
