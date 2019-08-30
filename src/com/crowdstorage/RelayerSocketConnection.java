@@ -1,6 +1,7 @@
 package com.crowdstorage;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -18,7 +19,7 @@ public class RelayerSocketConnection implements Runnable {
 
         try {
             relayedServerSocket = new ServerSocket(0);
-            System.out.println("established relay address: " + host + ":" + relayedServerSocket.getLocalPort());
+            sendConnectionMessage(relayedServerSocket.getLocalPort());
             while(true) {
                 Socket relayedClientSocket = relayedServerSocket.accept();
                 new Thread(new RelayConnectionHandler(proxiedClientSocket, relayedClientSocket)).start();
@@ -32,6 +33,17 @@ public class RelayerSocketConnection implements Runnable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void sendConnectionMessage(int port){
+        try {
+            PrintWriter writeToProxy = new PrintWriter(proxiedClientSocket.getOutputStream());
+            System.out.println("established relay address: " + host + ":" + port);
+            writeToProxy.println(host +":"+port);
+            writeToProxy.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

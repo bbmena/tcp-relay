@@ -17,32 +17,23 @@ public class RelayConnectionHandler implements Runnable {
     }
 
     public void run(){
-        char[] request = new char[BUFFER_SIZE];
-        BufferedReader readFromSender = null;
+        char[] message = new char[BUFFER_SIZE];
+        BufferedReader readFromSender;
         PrintWriter writeToReceiver = null;
 
         try {
             readFromSender = new BufferedReader(new InputStreamReader(sender.getInputStream()));
             writeToReceiver = new PrintWriter(receiver.getOutputStream());
             int val;
-            while((val = readFromSender.read(request)) != -1) {
-                writeToReceiver.write(request, 0, val);
+            while((val = readFromSender.read(message)) != -1) {
+                writeToReceiver.write(message, 0, val);
                 writeToReceiver.flush();
             }
         } catch (IOException e){
             e.printStackTrace();
         } finally {
-           close(readFromSender, writeToReceiver);
+            writeToReceiver.flush();
         }
 
-    }
-
-    private void close(BufferedReader in, PrintWriter out){
-        try {
-            if (in != null) in.close();
-            if (out != null) out.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
     }
 }
