@@ -8,12 +8,12 @@ import java.net.Socket;
 public class ProxyAndRelayHandler implements Runnable  {
 
     private Socket relayedClientSocket;
-    private PrintWriter writeToProxy;
+    private Socket proxiedClientNotifierSocket;
     private String host;
 
-    public ProxyAndRelayHandler(Socket relayedClientSocket, PrintWriter writeToProxy, String host){
+    public ProxyAndRelayHandler(Socket relayedClientSocket, Socket proxiedClientNotifierSocket, String host){
         this.relayedClientSocket = relayedClientSocket;
-        this.writeToProxy = writeToProxy;
+        this.proxiedClientNotifierSocket = proxiedClientNotifierSocket;
         this.host = host;
     }
 
@@ -21,6 +21,7 @@ public class ProxyAndRelayHandler implements Runnable  {
         ServerSocket proxiedClientDataServer;
 
         try {
+            PrintWriter writeToProxy = new PrintWriter(proxiedClientNotifierSocket.getOutputStream());
             proxiedClientDataServer = new ServerSocket(0);
             writeToProxy.println(host + ":" + proxiedClientDataServer.getLocalPort());
             writeToProxy.flush();

@@ -23,7 +23,7 @@ public class RelayerSocketConnection implements Runnable {
             sendConnectionMessage(writeToProxy, relayedServerSocket.getLocalPort());
             while(true) {
                 Socket relayedClientSocket = relayedServerSocket.accept();
-                new Thread(new ProxyAndRelayHandler(relayedClientSocket, writeToProxy, host)).start();
+                new Thread(new ProxyAndRelayHandler(relayedClientSocket, proxiedClientNotifierSocket, host)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
