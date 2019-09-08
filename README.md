@@ -21,7 +21,9 @@ Example:
 
 
     Socket relayListenerSocket = new Socket(host, relayPort);
+    System.out.println("Connected to relay at " + host + " on port " + relayPort);
     BufferedReader relayIn = new BufferedReader(new InputStreamReader(relayListenerSocket.getInputStream()));
+    System.out.println("Contact me at: " + relayIn.readLine());
 
     while(true) {
         String line;
