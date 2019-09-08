@@ -18,12 +18,14 @@ public class RelayerSocketConnection implements Runnable {
         ServerSocket relayedServerSocket = null;
 
         try {
-            PrintWriter writeToProxy = new PrintWriter(proxiedClientNotifierSocket.getOutputStream());
+            PrintWriter writeToProxy = new PrintWriter(proxiedClientNotifierSocket.getOutputStream(), true);
             relayedServerSocket = new ServerSocket(0);
             sendConnectionMessage(writeToProxy, relayedServerSocket.getLocalPort());
             while(true) {
                 Socket relayedClientSocket = relayedServerSocket.accept();
-                new Thread(new ProxyAndRelayHandler(relayedClientSocket, proxiedClientNotifierSocket, host)).start();
+                ServerSocket proxiedClientDataServer = new ServerSocket(0);
+                writeToProxy.println(host +":"+proxiedClientDataServer.getLocalPort());
+                new Thread(new ProxyAndRelayHandler(relayedClientSocket, proxiedClientDataServer)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,6 +41,5 @@ public class RelayerSocketConnection implements Runnable {
     private void sendConnectionMessage(PrintWriter writeToProxy, int port){
         System.out.println("established relay address: " + host + ":" + port);
         writeToProxy.println(host +":"+port);
-        writeToProxy.flush();
     }
 }
